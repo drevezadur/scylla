@@ -1,0 +1,36 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor ClientA
+participant PlayerBoardA
+participant GameImpl
+participant PlayerBoardB
+
+ClientA -> GameImpl : getPlayerBoard(A)
+ClientA <-- GameImpl : PlayerBoardA
+
+ClientA -> PlayerBoardA : fireAt
+activate ClientA
+
+PlayerBoardA -> GameImpl : shot
+GameImpl -> PlayerBoardB : resolveShot
+note right
+The last case of the last ship is hit.
+end note
+PlayerBoardB -> PlayerBoardB : refreshFleetStatus
+note right
+Fleet status set as SUNK
+Player state set as LOSER
+end note
+
+GameImpl <-- PlayerBoardB : shot result
+GameImpl -> GameImpl : updateInternalStateAfterAction
+GameImpl -> PlayerBoardA : setAsWinner()
+GameImpl --> PlayerBoardA : shot result
+PlayerBoardA --> ClientA : shot result
+
+deactivate ClientA
+
+@enduml

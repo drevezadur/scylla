@@ -1,0 +1,36 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+participant "Main" as Player
+participant ScenarioLoader
+participant ScenarioFactory
+participant Scenario
+participant GameFactory
+participant Game
+
+group Step 1: Load scenario
+Player -> ScenarioLoader : loadFromPath
+ScenarioLoader -> ScenarioLoader : load file content
+
+ScenarioLoader -> ScenarioFactory : createScenario
+
+ScenarioFactory -> Scenario : new
+activate Scenario
+ScenarioFactory --> Player : scenario
+end group
+
+
+group Step 2: Execute scenario
+
+Player -> GameFactory : createGame
+GameFactory -> Game : new
+activate Game
+
+Player <-- GameFactory : game
+
+Player -> Scenario : execute(Game)
+end group
+
+@enduml

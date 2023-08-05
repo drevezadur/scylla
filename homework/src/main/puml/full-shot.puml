@@ -1,0 +1,26 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor ClientA
+participant PlayerBoardA
+participant GameImpl
+participant PlayerBoardB
+
+ClientA -> GameImpl : getPlayerBoard(A)
+ClientA <-- GameImpl : PlayerBoardA
+
+ClientA -> PlayerBoardA : fireAt
+activate ClientA
+
+PlayerBoardA -> GameImpl : shot
+GameImpl -> PlayerBoardB : resolveShot
+GameImpl <-- PlayerBoardB : shot result
+GameImpl --> PlayerBoardA : shot result
+PlayerBoardA --> ClientA : shot result
+
+deactivate ClientA
+
+
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+hide attributes
+
+package lang {
+}
+
+package domain {
+    package internal {
+    }
+}
+
+package service {
+    package internal {
+    }
+}
+
+
+
+domain --> lang
+domain.internal --> lang
+
+service --> lang
+service.internal --> lang
+
+service --> domain
+service.internal --> domain
+
+@enduml

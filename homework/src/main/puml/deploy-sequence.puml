@@ -1,0 +1,17 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor Client
+
+Client -> Game : getPlayerBoard
+
+loop for each ship type
+    Client -> PlayerBoard : deployShip(<ship-type>,...)
+    PlayerBoard -> ShipFactory : createShip
+end
+PlayerBoard -> Game : fleetDeployed
+
+
+@enduml

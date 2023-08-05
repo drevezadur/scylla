@@ -1,0 +1,74 @@
+A deploy CARRIER 0,0 ROW
+A deploy BATTLESHIP 0,1 ROW
+A deploy CRUISER 0,2 ROW
+A deploy SUBMARINE 0,3 ROW
+A deploy DESTROYER 0,4 ROW
+
+B deploy CARRIER 0,0 COLUMN
+B deploy BATTLESHIP 1,0 COLUMN
+B deploy CRUISER 2,0 COLUMN
+B deploy SUBMARINE 3,0 COLUMN
+B deploy DESTROYER 4,0 COLUMN
+
+# Sunk CARRIER of A
+A fire 0,0
+B fire 0,0
+
+A fire 1,0
+B fire 1,0
+
+A fire 2,0
+B fire 2,0
+
+A fire 3,0
+B fire 3,0
+
+A fire 4,0
+B fire 4,0
+
+
+# Sunk BATTLESHIP of A
+
+A fire 0,1
+B fire 0,1
+
+A fire 1,1
+B fire 1,1
+
+A fire 2,1
+B fire 2,1
+
+A fire 3,1
+B fire 3,1
+
+# Sunk CRUISER of A
+
+A fire 0,2
+B fire 0,2
+
+A fire 1,2
+B fire 1,2
+
+A fire 2,2
+B fire 2,2
+
+
+# Sunk SUBMARINE of A
+
+A fire 0,3
+B fire 0,3
+
+A fire 1,3
+B fire 1,3
+
+A fire 2,3
+B fire 2,3
+
+
+# Sunk DESTROYER of A
+
+A fire 0,4
+B fire 0,4
+
+A fire 1,4
+B fire 1,4

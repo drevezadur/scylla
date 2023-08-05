@@ -1,0 +1,89 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+hide attributes
+
+package lang {
+    enum FleetStatus
+    enum GameStatus
+    enum GridOrientation
+    class Location
+    enum Player
+    enum PlayerState
+    enum ShipStructuralStatus
+    enum ShipType
+    enum ShotResult
+}
+
+package domain {
+    interface Game
+    interface GameFactory
+    class GameProvider
+    interface PlayerBoard
+    interface Ship
+}
+
+package domain.internal {
+    class DefaultGameFactory
+    class DefaultPlayerBoardFactory
+    class DefaultShipFactory
+    class GameImpl
+    interface GameManager
+    class InternalGameProvider
+    interface MutablePlayerBoard
+    interface MutableShip
+    interface PlayerBoardFactory
+    class PlayerBoardImpl
+    interface ShipFactory
+    class ShipImpl
+}
+
+GameFactory <|- DefaultGameFactory
+PlayerBoardFactory <|- DefaultPlayerBoardFactory
+ShipFactory <|- DefaultShipFactory
+
+Game <|- GameImpl
+GameManager <|- GameImpl
+
+PlayerBoard <|- MutablePlayerBoard
+MutablePlayerBoard <|- PlayerBoardImpl
+
+Ship <|- MutableShip
+MutableShip <|- ShipImpl
+
+
+
+
+package service {
+    class BadInstructionFormatException
+    interface Scenario
+    class ScenarioLoader
+    class UnknownInstructionExecution
+}
+
+package service.internal {
+    interface Command
+    interface CommandFactory
+    class DefaultCommandFactory
+    class DefaultInstructionExecutor
+    class DefaultScenario
+    class DefaultScenarioFactory
+    class DeployCommand
+    class FireCommand
+    class IgnoredCommand
+    interface InstructionExecutor
+    object InstructionFormatter
+    interface ScenarioFactory
+}
+
+CommandFactory <|- DefaultCommandFactory
+InstructionExecutor <|- DefaultInstructionExecutor
+
+Scenario <|- DefaultScenario
+ScenarioFactory <|- DefaultScenarioFactory
+
+Command <|- IgnoredCommand
+Command <|- DeployCommand
+Command <|- FireCommand
+
+@enduml

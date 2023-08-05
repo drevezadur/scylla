@@ -1,0 +1,45 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+
+actor ClientA
+actor ClientB
+
+loop until all ships of a PlayerBoard are sunk
+
+    ClientA -> GameImpl : getPlayerBoard(A)
+    ClientA <-- GameImpl : PlayerBoardA
+
+    ClientA -> PlayerBoardA : fireAt
+'    activate ClientA
+'
+'    PlayerBoardA -> GameImpl : shot
+'    GameImpl -> PlayerBoardB : resolveShot
+'    GameImpl <-- PlayerBoardB : shot result
+'    GameImpl --> PlayerBoardA : shot result
+'    PlayerBoardA --> ClientA : shot result
+'
+'    deactivate ClientA
+
+
+    ClientB -> GameImpl : getPlayerBoard(B)
+    ClientB <-- GameImpl : PlayerBoardB
+
+    ClientB -> PlayerBoardB : fireAt
+'    activate ClientB
+'
+'    PlayerBoardB -> GameImpl : shot
+'    GameImpl -> PlayerBoardA : resolveShot
+'    GameImpl <-- PlayerBoardA : shot result
+'    GameImpl --> PlayerBoardB : shot result
+'    PlayerBoardB --> ClientB : shot result
+'
+'    deactivate ClientB
+end
+
+
+
+
+@enduml

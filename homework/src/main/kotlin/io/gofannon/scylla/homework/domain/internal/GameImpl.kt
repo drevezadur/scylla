@@ -59,25 +59,25 @@ internal class GameImpl(
         if (boards[player]!!.getFleetStatus() != FleetStatus.UNHARMED)
             throw IllegalStateException("Invalid fleet status. It should be UNHARMED")
 
-        val allFleetDeployed = boards.all { it.value.getPlayerState() == PlayerState.FLEET_DEPLOYED }
+        val allFleetDeployed = boards.all{ it.value.getPlayerState() == PlayerState.FLEET_DEPLOYED }
         if (allFleetDeployed) {
             status = DEPLOYED
         }
     }
 
-    override fun shot(target: Player, at: Location): ShotResult {
+    override fun shot(shooter: Player, at: Location): ShotResult {
         checkGameInPlayStatus()
-        checkNextPlayer(target)
+        checkNextPlayer(shooter)
 
-        updateInternalStateBeforeAction(target)
+        updateInternalStateBeforeAction(shooter)
 
-        val targetBoard = boardOf(target)
+        val targetBoard = boardOf(shooter)
         val shotResult = targetBoard.resolveShot(at)
 
         if (shotResult != ShotResult.MISSED)
-            updateInternalStateAfterAction(target)
+            updateInternalStateAfterAction(shooter)
 
-        nextPlayer = getOpponent(target)
+        nextPlayer = getOpponent(shooter)
         return shotResult
     }
 

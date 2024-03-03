@@ -21,5 +21,10 @@ import io.gofannon.scylla.homework.lang.Location
 import io.gofannon.scylla.homework.lang.ShotResult
 
 internal interface MutableShip : Ship {
+    /**
+     * Resolve a hit on the ship
+     * @param location the location on the ship
+     * @return the result of the shot
+     */
     fun hitAt(location: Location): ShotResult
 }

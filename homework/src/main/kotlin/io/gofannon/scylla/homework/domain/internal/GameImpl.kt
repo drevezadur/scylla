@@ -56,13 +56,20 @@ internal class GameImpl(
     }
 
     override fun fleetDeployed(player: Player) {
-        if (boards[player]!!.getFleetStatus() != FleetStatus.UNHARMED)
+        if (!isUnharmedFleet(player))
             throw IllegalStateException("Invalid fleet status. It should be UNHARMED")
 
-        val allFleetDeployed = boards.all{ it.value.getPlayerState() == PlayerState.FLEET_DEPLOYED }
-        if (allFleetDeployed) {
+        if (areAllFieldDeployed()) {
             status = DEPLOYED
         }
+    }
+
+    private fun isUnharmedFleet(player: Player): Boolean {
+        return boards[player]!!.getFleetStatus() == FleetStatus.UNHARMED
+    }
+
+    private fun areAllFieldDeployed(): Boolean {
+        return boards.all { it.value.getPlayerState() == PlayerState.FLEET_DEPLOYED }
     }
 
     override fun shot(shooter: Player, at: Location): ShotResult {
@@ -71,9 +78,7 @@ internal class GameImpl(
 
         updateInternalStateBeforeAction(shooter)
 
-        val targetBoard = boardOf(shooter)
-        val shotResult = targetBoard.resolveShot(at)
-
+        val shotResult = resolveShot(shooter, at)
         if (shotResult != ShotResult.MISSED)
             updateInternalStateAfterAction(shooter)
 
@@ -83,12 +88,25 @@ internal class GameImpl(
 
     private fun updateInternalStateBeforeAction(player: Player) {
         if (status == DEPLOYED) {
-            status = RUNNING
-            turn = 1
-            boards.values.forEach(MutablePlayerBoard::startFighting)
+            startFighting()
         } else if (isTurnFirstPlayer(player)) {
-            turn++
+            nextTurn()
         }
+    }
+
+    private fun startFighting() {
+        status = RUNNING
+        turn = 1
+        boards.values.forEach(MutablePlayerBoard::startFighting)
+    }
+
+    private fun nextTurn() {
+        turn++
+    }
+
+    private fun resolveShot(shooter: Player, at : Location) : ShotResult {
+        val targetBoard = opponentBoardOf(shooter)
+        return targetBoard.takeShotAt(at)
     }
 
     private fun checkGameInPlayStatus() {
@@ -108,7 +126,7 @@ internal class GameImpl(
         return player == PLAYER_A
     }
 
-    private fun boardOf(currentPlayer: Player): MutablePlayerBoard {
+    private fun opponentBoardOf(currentPlayer: Player): MutablePlayerBoard {
         val targetFleetId = getOpponent(currentPlayer)
         return boards[targetFleetId]!!
     }
@@ -121,10 +139,10 @@ internal class GameImpl(
     }
 
     private fun updateInternalStateAfterAction(target: Player) {
-        val targetBoard = boardOf(target)
-        if( targetBoard.getFleetStatus() == FleetStatus.SUNK ) {
+        val targetBoard = opponentBoardOf(target)
+        if (targetBoard.getFleetStatus() == FleetStatus.SUNK) {
             val shooter = getOpponent(target)
-            val shooterBoard = boardOf(shooter)
+            val shooterBoard = opponentBoardOf(shooter)
             shooterBoard.setPlayerState(PlayerState.WINNER)
             targetBoard.setPlayerState(PlayerState.LOSER)
             winner = target
@@ -137,6 +155,12 @@ internal class GameImpl(
     }
 
     companion object {
+        /**
+         * Create a fleet
+         * @param boardFactory the factory of board
+         * @param gameManager the manager of games
+         * @return a map of mutable boards with players as keys
+         */
         private fun createFleets(
             boardFactory: PlayerBoardFactory,
             gameManager: GameManager

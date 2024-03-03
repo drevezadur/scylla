@@ -21,7 +21,6 @@ import io.gofannon.scylla.homework.lang.Location
 import io.gofannon.scylla.homework.lang.ShipType
 
 internal class DefaultShipFactory : ShipFactory {
-
     override fun createShip(type: ShipType, origin: Location, orientation: GridOrientation): MutableShip {
         return ShipImpl(type, origin, orientation)
     }

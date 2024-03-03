@@ -25,8 +25,6 @@ import io.gofannon.scylla.homework.domain.GameFactory
 class DefaultGameFactory(
     private val fleetBoardFactory : PlayerBoardFactory
 ) : GameFactory {
-
-
     override fun createGame(): Game {
         return GameImpl(fleetBoardFactory)
     }

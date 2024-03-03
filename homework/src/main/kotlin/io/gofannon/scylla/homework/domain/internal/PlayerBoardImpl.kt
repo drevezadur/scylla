@@ -17,6 +17,7 @@
 package io.gofannon.scylla.homework.domain.internal
 
 import io.gofannon.scylla.homework.domain.Ship
+import io.gofannon.scylla.homework.domain.internal.ShipHelper.isCompleteFleet
 import io.gofannon.scylla.homework.lang.*
 import io.gofannon.scylla.homework.lang.ShotResult.MISSED
 
@@ -39,7 +40,7 @@ internal class PlayerBoardImpl(
         checkNotOverrideAnotherShip(ship)
         ships.add(ship)
 
-        if (ships.size == ShipType.entries.size) {
+        if (isCompleteFleet(ships)) {
             playerState = PlayerState.FLEET_DEPLOYED
             refreshFleetStatus()
             gameManager.fleetDeployed(player)
@@ -71,20 +72,24 @@ internal class PlayerBoardImpl(
     }
 
     override fun fireAt(location: Location): ShotResult {
-        if (playerState != PlayerState.FLEET_DEPLOYED && playerState != PlayerState.FIGHTING)
-            throw IllegalStateException("Player state shall be in FLEET_DEPLOYED or FIGHTING")
+        assertReadyToFight()
         return gameManager.shot(player, location)
     }
 
-    override fun setPlayerState(state : PlayerState) {
+    private fun assertReadyToFight() {
+        if (playerState != PlayerState.FLEET_DEPLOYED && playerState != PlayerState.FIGHTING)
+            throw IllegalStateException("Player state shall be in FLEET_DEPLOYED or FIGHTING")
+    }
+
+    override fun setPlayerState(state: PlayerState) {
         this.playerState = state
     }
 
-    override fun resolveShot(at: Location): ShotResult {
-        val ship = findShipAt(at)
+    override fun takeShotAt(shotLocation: Location): ShotResult {
+        val ship = findShipAt(shotLocation)
             ?: return MISSED
 
-        val shotResult = ship.hitAt(at)
+        val shotResult = ship.hitAt(shotLocation)
 
         if (shotResult.structuralChange)
             refreshFleetStatus()
@@ -117,7 +122,7 @@ internal class PlayerBoardImpl(
          * @return the status of the fleet
          */
         fun computeFleetStatus(ships: List<Ship>): FleetStatus {
-            if (ships.size != ShipType.entries.size)
+            if (!isCompleteFleet(ships))
                 return FleetStatus.NOT_DEPLOYED
 
             val allStatus = ships.map { it.status }.toSet()

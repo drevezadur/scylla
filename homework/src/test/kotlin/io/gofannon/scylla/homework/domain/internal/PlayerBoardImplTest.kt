@@ -104,7 +104,7 @@ class PlayerBoardImplTest {
         val y = getAbscisse(type)
 
         for (x in 0..<type.size) {
-            board.resolveShot(Location(x, y))
+            board.takeShotAt(Location(x, y))
         }
     }
 
@@ -286,7 +286,7 @@ class PlayerBoardImplTest {
         every { gameManager.fleetDeployed(Player.PLAYER_A) } returns Unit
         makeDefaultDeployment()
 
-        assertThat(board.resolveShot(Location(x, y)))
+        assertThat(board.takeShotAt(Location(x, y)))
             .isSameAs(shotResult)
 
         verify { gameManager.fleetDeployed(Player.PLAYER_A) }
@@ -297,9 +297,9 @@ class PlayerBoardImplTest {
         every { gameManager.fleetDeployed(Player.PLAYER_A) } returns Unit
         makeDefaultDeployment()
         val location = Location(0, 0)
-        board.resolveShot(location)
+        board.takeShotAt(location)
 
-        assertThat(board.resolveShot(location))
+        assertThat(board.takeShotAt(location))
             .isSameAs(ShotResult.ALREADY_SHOT)
 
         verify { gameManager.fleetDeployed(Player.PLAYER_A) }
@@ -309,9 +309,9 @@ class PlayerBoardImplTest {
     fun `resolveShot shall handle SUNK`() {
         every { gameManager.fleetDeployed(Player.PLAYER_A) } returns Unit
         makeDefaultDeployment()
-        board.resolveShot(Location(0, 4))
+        board.takeShotAt(Location(0, 4))
 
-        assertThat(board.resolveShot(Location(1, 4)))
+        assertThat(board.takeShotAt(Location(1, 4)))
             .isSameAs(ShotResult.SUNK)
 
         verify { gameManager.fleetDeployed(Player.PLAYER_A) }
@@ -361,7 +361,7 @@ class PlayerBoardImplTest {
 
     private fun damage(type: ShipType) {
         val y = getAbscisse(type)
-        board.resolveShot(Location(0, y))
+        board.takeShotAt(Location(0, y))
     }
 
     @Test

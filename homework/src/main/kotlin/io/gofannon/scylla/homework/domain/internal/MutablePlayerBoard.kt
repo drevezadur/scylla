@@ -33,10 +33,10 @@ interface MutablePlayerBoard : PlayerBoard {
 
     /**
      * The board receives a shot on its fleet
-     * @param at the shot location
+     * @param shotLocation the location of the shot
      * @return the result of the shot
      */
-    fun resolveShot(at: Location): ShotResult
+    fun takeShotAt(shotLocation: Location): ShotResult
 
     /**
      * The player of the board is designated as the winner

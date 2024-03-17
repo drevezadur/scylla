@@ -1,0 +1,8 @@
+create player John
+create player Jane
+John deploy Carrier at A0 on row
+John deploy Battleship at A1 on row
+John deploy Cruiser at A2 on row
+John deploy Submarine at A3 on row
+John deploy Destroyer at A4 on row
+

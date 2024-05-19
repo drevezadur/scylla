@@ -58,7 +58,6 @@ class UseCaseContext(
     val battleUseCaseManager: BattleUseCaseManager = BattleUseCaseManagerBean(
         battleManager,
         fleetManager,
-        timeProvider,
         useCaseFactory
     ),
 

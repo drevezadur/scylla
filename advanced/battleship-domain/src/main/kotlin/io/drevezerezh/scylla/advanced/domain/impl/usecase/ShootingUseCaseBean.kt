@@ -117,7 +117,6 @@ internal class ShootingUseCaseBean(
 
 
     private fun checkPlayerTurn() {
-        //TODO enhance code
         if (battle.nextPlayer != shot.shootingPlayer) {
             throw NotPlayerTurnException(
                 battle.id,

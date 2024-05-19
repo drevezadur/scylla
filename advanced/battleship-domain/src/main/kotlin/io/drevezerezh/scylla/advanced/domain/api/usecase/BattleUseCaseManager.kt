@@ -98,13 +98,4 @@ interface BattleUseCaseManager {
      */
     @Throws(BattleNotFoundException::class)
     fun getFleet(fleetId: FleetId): Fleet
-
-    /**
-     * End a battle
-     *
-     * Does nothing when battle is already finished
-     * @return true when the battle has been finished, false when the battle was already finished
-     */
-    @Throws(BattleNotFoundException::class, BattleEndedException::class)
-    fun endBattle(battleId: String): Boolean
 }

@@ -113,5 +113,4 @@ class BattleUpdate {
         else
             battle.turn
     }
-
 }

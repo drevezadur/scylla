@@ -32,6 +32,7 @@ data class Battle(
     val status: BattleStatus = BattleStatus.DEPLOYMENT,
     val turn: Int = 0
 ) {
+
     val winner: BattlePlayer?
         get() {
             return if (status != BattleStatus.FINISHED)
@@ -40,12 +41,14 @@ data class Battle(
                 nextPlayer
         }
 
+
     fun getPlayerId(playerOrder: BattlePlayer): String {
         return when (playerOrder) {
             BattlePlayer.FIRST -> player1Id
             BattlePlayer.SECOND -> player2Id
         }
     }
+
 
     fun getFleetId(playerOrder: BattlePlayer): FleetId {
         return FleetId(id, playerOrder)

@@ -29,16 +29,14 @@ class FleetManagerBean(
     private val fleetStore: FleetStore
 ) : FleetManager {
 
-    private val  logger = LoggerFactory.getLogger(FleetManagerBean::class.java)
-
     override fun getFleet(id: FleetId): Fleet {
         return fleetStore.getById(id)
     }
 
     override fun createFleet(id: FleetId): Fleet {
         if( fleetStore.contains(id)) {
-            if( logger.isTraceEnabled)
-                logger.trace("Cannot create fleet $id because such a fleet is already exist")
+            if( LOGGER.isTraceEnabled)
+                LOGGER.trace("Cannot create fleet $id because such a fleet is already exist")
             throw FleetAlreadyDeployedException(id)
         }
 
@@ -56,5 +54,9 @@ class FleetManagerBean(
 
     override fun deleteFleet(id: FleetId) : Boolean{
         return fleetStore.deleteById(id)
+    }
+
+    companion object {
+        private val  LOGGER = LoggerFactory.getLogger(FleetManagerBean::class.java)
     }
 }

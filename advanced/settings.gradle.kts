@@ -8,4 +8,8 @@ include("battleship-server")
 
 include("battleship-scenario-dsl")
 include("battleship-scenario-dsl-grammar")
-include("integration-tests")
+
+include("battleship-scenario-dsl-domain-driver")
+include("battleship-scenario-dsl-rest-driver")
+
+include("server-integration-tests")

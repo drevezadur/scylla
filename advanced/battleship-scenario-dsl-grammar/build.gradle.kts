@@ -14,7 +14,7 @@ java {
 
 
 dependencies {
-    antlr("org.antlr:antlr4:4.5")
+    antlr(libs.antlr)
 }
 
 
@@ -23,6 +23,7 @@ repositories {
 }
 
 tasks.generateGrammarSource {
+    mustRunAfter(tasks.findByPath("explodeCodeSourceMain"))
     maxHeapSize = "64m"
     arguments = arguments + listOf("-visitor", "-long-messages")
 }

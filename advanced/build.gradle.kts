@@ -1,5 +1,6 @@
 plugins {
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version libs.versions.kotlin
+    id("com.autonomousapps.dependency-analysis") version "1.31.0"
 }
 
 group = "io.drevezerezh.scylla.advanced"
@@ -11,6 +12,6 @@ repositories {
 
 
 tasks.wrapper {
-    gradleVersion = "8.6"
+    gradleVersion = "8.7"
 }
 

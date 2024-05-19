@@ -16,6 +16,8 @@ java {
 dependencies {
     implementation(project(":battleship-scenario-dsl-grammar"))
     implementation(project(":battleship-lang"))
+    implementation(libs.slf4j.api)
+
 
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter.engine)

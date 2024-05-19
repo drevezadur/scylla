@@ -1,108 +1,58 @@
+/*
+ * Copyright (c) 2024 gofannon.xyz
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.drevezerezh.scylla.advanced.persistance
 
 import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
-import io.drevezerezh.scylla.advanced.domain.api.Player
-import io.drevezerezh.scylla.advanced.domain.api.PlayerAlreadyExistException
-import io.drevezerezh.scylla.advanced.domain.api.PlayerNotFoundException
-import io.drevezerezh.scylla.advanced.domain.api.PlayerStore
-import org.slf4j.LoggerFactory
+import io.drevezerezh.scylla.advanced.domain.api.player.NamedPlayerNotFoundException
+import io.drevezerezh.scylla.advanced.domain.api.player.Player
+import io.drevezerezh.scylla.advanced.domain.api.player.PlayerAlreadyExistException
+import io.drevezerezh.scylla.advanced.domain.api.player.PlayerNotFoundException
+import io.drevezerezh.scylla.advanced.domain.spi.PlayerStore
 import org.springframework.stereotype.Component
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.read
-import kotlin.concurrent.write
 
 @Component
-class MemoryPlayerStoreBean : PlayerStore {
+class MemoryPlayerStoreBean : MemoryItemStore<String, Player, PlayerPJson>(), PlayerStore {
 
-    private val readWriteLock = ReentrantReadWriteLock()
-    private val playerMap = HashMap<String, PlayerPJson>()
+    override fun extractDomainId(domain: Player): String = domain.id
 
-    override fun save(player: Player) {
-        val persistedPlayer = PlayerMapper.toPersistance(player)
+    override fun extractPersistanceId(persistance: PlayerPJson): String = persistance.id
 
-        readWriteLock.read {
-            val existingPlayer = playerMap.values.firstOrNull { it.name == player.name }
-            if (existingPlayer != null)
-                throw PlayerAlreadyExistException(existingPlayer.id, setOf("name"))
-            readWriteLock.write {
-                playerMap[persistedPlayer.id] = persistedPlayer
-            }
-        }
+    override fun toPersistance(domain: Player): PlayerPJson = PlayerMapper.toPersistance(domain)
+
+    override fun toDomain(persistance: PlayerPJson): Player = PlayerMapper.toDomain(persistance)
+
+    override fun itemNotFound(id: String): Nothing = throw PlayerNotFoundException(id)
+
+    override fun getTypeReferenceList(): TypeReference<List<PlayerPJson>> =
+        object : TypeReference<List<PlayerPJson>>() {}
+
+    override fun hasSameDomainKey(original: Player, persisted: PlayerPJson): Boolean {
+        return original.name == persisted.name
     }
 
-    override fun saveAll(vararg players: Player) {
-        val persistedPlayers = players.map(PlayerMapper::toPersistance)
-        readWriteLock.write {
-            persistedPlayers.forEach {
-                playerMap[it.id] = it
-            }
-        }
+    override fun failToSave(itemToSave: Player, duplicatedDomainKeyItems: Set<Player>): Nothing {
+        throw PlayerAlreadyExistException(itemToSave.id, setOf("name"))
     }
 
-    override fun deleteById(playerId: String): Boolean {
-        LOGGER.info("deleteById($playerId)")
-        readWriteLock.write {
-            LOGGER.info("deleteById($playerId) [write]")
-            return playerMap.remove(playerId) != null
-        }
+    override fun getByName(name: String): Player {
+        return getAll { it.name == name }.firstOrNull() ?: throw NamedPlayerNotFoundException(name)
     }
 
-    override fun deleteAll() {
-        LOGGER.info("deleteAll()")
-        readWriteLock.write {
-            LOGGER.info("deleteAll() [write]")
-            playerMap.clear()
-        }
-    }
-
-    override fun contains(playerId: String): Boolean {
-        readWriteLock.read {
-            return playerMap.contains(playerId)
-        }
-    }
-
-    override fun getById(playerId: String): Player {
-        val persistedPlayer = readWriteLock.read {
-            playerMap[playerId]
-        }
-
-        if (persistedPlayer == null)
-            throw PlayerNotFoundException(playerId)
-
-        return PlayerMapper.toDomain(persistedPlayer)
-    }
-
-
-    override fun getAll(): List<Player> {
-        val persistedPlayerList = readWriteLock.read {
-            playerMap.values.toList()
-        }
-        return persistedPlayerList.map(PlayerMapper::toDomain)
-    }
-
-
-    fun exportToJson(): String {
-        val persistedPlayerList = readWriteLock.read { playerMap.values.toList() }
-        val objectMapper = ObjectMapper()
-        return objectMapper.writeValueAsString(persistedPlayerList)
-    }
-
-
-    fun importJson(content: String) {
-        val objectMapper = ObjectMapper()
-        val newPersistedPlayerList: List<PlayerPJson> = objectMapper.readValue(
-            content,
-            object : TypeReference<List<PlayerPJson>>() {}
-        )
-
-        readWriteLock.write {
-            playerMap.clear()
-            playerMap.putAll(newPersistedPlayerList.associateBy { it.id })
-        }
-    }
-
-    companion object {
-        private val LOGGER = LoggerFactory.getLogger(MemoryPlayerStoreBean::class.java)
+    override fun containsName(name: String): Boolean {
+        return getAll { it.name == name }.isNotEmpty()
     }
 }

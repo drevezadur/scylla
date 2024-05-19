@@ -3,11 +3,13 @@ package io.drevezerezh.scylla.advanced.webserver.controller
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
-import io.drevezerezh.scylla.advanced.domain.api.Player
-import io.drevezerezh.scylla.advanced.domain.api.PlayerManager
-import io.drevezerezh.scylla.advanced.domain.api.PlayerStore
+import io.drevezerezh.scylla.advanced.domain.api.player.Player
+import io.drevezerezh.scylla.advanced.domain.api.usecase.PlayerUseCaseManager
+import io.drevezerezh.scylla.advanced.domain.impl.PlayerManager
+import io.drevezerezh.scylla.advanced.domain.spi.PlayerStore
 import io.drevezerezh.scylla.advanced.domain.impl.IdProvider
 import io.drevezerezh.scylla.advanced.domain.impl.PlayerManagerBean
+import io.drevezerezh.scylla.advanced.domain.impl.usecase.PlayerUseCaseManagerBean
 import io.drevezerezh.scylla.advanced.persistance.MemoryPlayerStoreBean
 import io.drevezerezh.scylla.advanced.webserver.controller.dto.PlayerJson
 import io.mockk.every
@@ -43,13 +45,18 @@ class PlayerControllerIntegTest {
     @TestConfiguration
     internal class AdditionalConfig {
         @Bean
-        fun playerStore() : PlayerStore {
+        fun playerStore(): PlayerStore {
             return MemoryPlayerStoreBean()
         }
 
         @Bean
-        fun playerManager(idProvider: IdProvider,playerStore: PlayerStore): PlayerManager {
+        fun playerManager(idProvider: IdProvider, playerStore: PlayerStore): PlayerManager {
             return PlayerManagerBean(idProvider, playerStore)
+        }
+
+        @Bean
+        fun playerManagementUseCase(playerManager: PlayerManager): PlayerUseCaseManager {
+            return PlayerUseCaseManagerBean(playerManager)
         }
     }
 
@@ -75,9 +82,11 @@ class PlayerControllerIntegTest {
 
     @Test
     fun `getAllPlayers shall return complete player id list when contains several players`() {
-        playerStore.saveAll(Player("id1", "John"), Player("id2", "Jane"),
+        playerStore.saveAll(
+            Player("id1", "John"), Player("id2", "Jane"),
             Player("id3", "Walter"),
-            Player("id4", "Laury"))
+            Player("id4", "Laury")
+        )
 
 
         val response = mockMvc.perform(MockMvcRequestBuilders.get("/players"))
@@ -128,7 +137,7 @@ class PlayerControllerIntegTest {
 
     @Test
     fun `createPlayer shall fail when name is invalid`() {
-        every { idProvider.createId() } returns  "in-creation"
+        every { idProvider.createId() } returns "in-creation"
 
         val response = mockMvc.perform(
             MockMvcRequestBuilders.post("/players")
@@ -156,7 +165,7 @@ class PlayerControllerIntegTest {
 
     @Test
     fun `createPlayer shall fail when name already exist`() {
-        every { idProvider.createId() } returns  "in-creation"
+        every { idProvider.createId() } returns "in-creation"
         playerStore.save(JOHN)
 
         val response = mockMvc.perform(
@@ -176,7 +185,7 @@ class PlayerControllerIntegTest {
         val error: ErrorResponse = objectMapper.readValue(content, ErrorResponse::class.java)
         assertThat(error)
             .extracting("status", "title")
-            .contains(400, "Player with id '${JOHN.id}' already exists")
+            .contains(400, "Player with id 'in-creation' already exists")
 
         assertThat(error.attributes)
             .containsOnly("name")
@@ -187,7 +196,7 @@ class PlayerControllerIntegTest {
 
     @Test
     fun `createPlayer shall create player when name does not exist`() {
-        every { idProvider.createId() } returns  JOHN.id
+        every { idProvider.createId() } returns JOHN.id
 
         val expectedLocation = "http://localhost/players/${JOHN.id}"
 

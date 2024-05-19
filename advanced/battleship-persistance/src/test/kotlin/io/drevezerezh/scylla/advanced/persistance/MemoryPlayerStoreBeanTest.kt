@@ -1,14 +1,28 @@
+/*
+ * Copyright (c) 2024 gofannon.xyz
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.drevezerezh.scylla.advanced.persistance
 
-import io.drevezerezh.scylla.advanced.domain.api.Player
-import io.drevezerezh.scylla.advanced.domain.api.PlayerNotFoundException
+import io.drevezerezh.scylla.advanced.domain.api.player.Player
+import io.drevezerezh.scylla.advanced.domain.api.player.PlayerNotFoundException
 import io.mockk.junit5.MockKExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
@@ -21,21 +35,6 @@ class MemoryPlayerStoreBeanTest {
         store = MemoryPlayerStoreBean()
     }
 
-    @AfterEach
-    fun tearDown() {
-    }
-
-    @Test
-    fun `save shall accept existing player`() {
-        store.save(JOHN)
-
-        val expectedPlayer = Player(JOHN.id, "Walter")
-        store.save(expectedPlayer)
-
-
-        assertThat(store.getById(JOHN.id))
-            .isEqualTo(expectedPlayer)
-    }
 
     @Test
     fun `save shall create a new player`() {
@@ -46,10 +45,30 @@ class MemoryPlayerStoreBeanTest {
     }
 
     @Test
-    fun `deleteById shall do nothing when player does not exist`() {
-        store.deleteById(JOHN.id)
+    fun `save shall update existing player`() {
+        store.save(JOHN)
 
-        assertThat(store.contains(JOHN.id))
+        val expectedPlayer = Player(JOHN.id, "Walter")
+        store.save(expectedPlayer)
+
+
+        assertThat(store.getById(JOHN.id))
+            .isEqualTo(expectedPlayer)
+    }
+
+
+    @Test
+    fun saveAll() {
+        store.saveAll(JOHN, JANE, WALTER)
+
+        assertThat(store.getAll())
+            .containsOnly(JOHN, JANE, WALTER)
+    }
+
+
+    @Test
+    fun `deleteById shall do nothing when player does not exist`() {
+        assertThat(store.deleteById(JOHN.id))
             .isFalse()
     }
 
@@ -57,11 +76,21 @@ class MemoryPlayerStoreBeanTest {
     fun `deleteById shall delete the player when it exists`() {
         store.save(JOHN)
 
-        store.deleteById(JOHN.id)
-
-        assertThat(store.contains(JOHN.id))
-            .isFalse()
+        assertThat(store.deleteById(JOHN.id))
+            .isTrue()
     }
+
+
+    @Test
+    fun deleteAll() {
+        store.saveAll(JOHN, JANE)
+
+        store.deleteAll()
+
+        assertThat(store.getAll())
+            .isEmpty()
+    }
+
 
     @Test
     fun `contains shall return false when player not in store`() {
@@ -156,5 +185,6 @@ class MemoryPlayerStoreBeanTest {
     companion object {
         private val JOHN = Player("01", "John")
         private val JANE = Player("02", "Jane")
+        private val WALTER = Player("03", "Walter")
     }
 }

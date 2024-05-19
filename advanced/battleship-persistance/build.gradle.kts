@@ -21,6 +21,7 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":battleship-lang"))
     implementation(project(":battleship-domain"))
     implementation(libs.spring.context)
 

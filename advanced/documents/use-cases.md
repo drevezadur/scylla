@@ -6,7 +6,7 @@
 
 A player is composed by:
 
-* a unique identifier
+* an unique identifier
 * a unique name
 
 The identifier is set by the server.

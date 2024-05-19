@@ -5,9 +5,9 @@ plugins {
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency)
 
-    kotlin("jvm") version "1.9.22"
-    kotlin("plugin.spring") version "1.9.22"
-    kotlin("plugin.jpa") version "1.9.22"
+    kotlin("jvm") version libs.versions.kotlin
+    kotlin("plugin.spring") version libs.versions.kotlin
+    kotlin("plugin.jpa") version libs.versions.kotlin
 }
 
 
@@ -17,12 +17,8 @@ java {
     }
 }
 
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
+    implementation( project(":battleship-lang"))
     implementation( project(":battleship-domain"))
     implementation( project(":battleship-persistance"))
     implementation(libs.spring.boot.actuator)
@@ -43,6 +39,12 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.spring.mockk)
 }
+
+
+repositories {
+    mavenCentral()
+}
+
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {

@@ -126,4 +126,47 @@ class GridLocationTest {
         assertThat(GridLocation.of(value))
             .isEqualTo(GridLocation(x, y))
     }
+
+    @Test
+    fun `toText shall accept empty collection`() {
+        assertThat(GridLocation.toText(emptySet()))
+            .isEmpty()
+    }
+
+    @Test
+    fun `toText shall accept single item collection`() {
+        assertThat(GridLocation.toText(setOf(GridLocation(1, 4))))
+            .isEqualTo("B4")
+    }
+
+    @Test
+    fun `toText shall accept several items collection`() {
+        assertThat(GridLocation.toText(setOf(GridLocation(1, 4), GridLocation(3, 8), GridLocation(5, 0))))
+            .isEqualTo("B4D8F0")
+    }
+
+    @Test
+    fun `toList shall not accept odd string`() {
+        assertThatThrownBy {
+            GridLocation.toList("A1B2C")
+        }.isInstanceOf(IllegalArgumentException::class.java)
+    }
+
+    @Test
+    fun `toList shall accept empty collection`() {
+        assertThat(GridLocation.toList(""))
+            .isEmpty()
+    }
+
+    @Test
+    fun `toList shall accept single item collection`() {
+        assertThat(GridLocation.toList("C5"))
+            .containsOnly(GridLocation(2,5))
+    }
+
+    @Test
+    fun `toList shall accept several items collection`() {
+        assertThat(GridLocation.toList("C5A0B9"))
+            .containsExactly(GridLocation(2,5), GridLocation(0,0), GridLocation(1,9))
+    }
 }

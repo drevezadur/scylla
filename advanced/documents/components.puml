@@ -1,0 +1,65 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+package "commons" {
+    [battleship-lang]
+}
+
+package "domain" {
+    [battleship-domain]
+}
+
+[battleship-domain] --> [battleship-lang]
+
+database "persistance" {
+    [battleship-persistance]
+}
+
+[battleship-persistance] --> [battleship-lang]
+[battleship-persistance] --> [battleship-domain]
+
+
+package "domain-specific-language" {
+    [battleship-scenario-dsl-grammar]
+    [battleship-scenario-dsl]
+}
+
+[battleship-scenario-dsl] --> [battleship-scenario-dsl-grammar]
+[battleship-scenario-dsl] --> [battleship-lang]
+
+package "server" {
+    HTTP -- [battleship-server]
+}
+
+[battleship-server] --> [battleship-lang]
+[battleship-server] --> [battleship-domain]
+[battleship-server] --> [battleship-persistance]
+
+package "test" {
+    [integration-tests] --> HTTP
+}
+
+[integration-tests] --> [battleship-lang]
+[integration-tests] --> [battleship-scenario-dsl]
+'[integration-tests] ..> [battleship-server]
+
+'"test" ..> "server"
+'"test" --> "domain-specific-language"
+'"test" --> "commons"
+'
+'"server" --> "persistance"
+'"persistance" --> "commons"
+'"server" --> "domain"
+'
+'"domain-specific-language" --> "commons"
+'
+'"persistance" --> "commons"
+'"persistance" --> "domain"
+'
+'"server" --> "commons"
+'"server" --> "domain"
+'"server" --> "persistance"
+'
+'"domain" --> "commons"
+
+@enduml

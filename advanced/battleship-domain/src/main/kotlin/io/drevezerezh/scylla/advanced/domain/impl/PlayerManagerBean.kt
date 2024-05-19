@@ -1,6 +1,23 @@
+/*
+ * Copyright (c) 2024 gofannon.xyz
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.drevezerezh.scylla.advanced.domain.impl
 
-import io.drevezerezh.scylla.advanced.domain.api.*
+import io.drevezerezh.scylla.advanced.domain.api.player.*
+import io.drevezerezh.scylla.advanced.domain.spi.PlayerStore
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -18,12 +35,12 @@ class PlayerManagerBean(
         return player
     }
 
-    override fun containsPlayer(id: String): Boolean {
-        return playerStore.contains(id)
+    override fun containsPlayer(playerId: String): Boolean {
+        return playerStore.contains(playerId)
     }
 
-    override fun getPlayerById(id: String): Player {
-        return playerStore.getById(id)
+    override fun getPlayerById(playerId: String): Player {
+        return playerStore.getById(playerId)
     }
 
     override fun getAllPlayers(): List<Player> {
@@ -49,9 +66,9 @@ class PlayerManagerBean(
         return nextPlayer
     }
 
-    override fun deletePlayer(id: String) : Boolean{
-        LOGGER.info("deletePlayer($id)")
-        return playerStore.deleteById(id)
+    override fun deletePlayer(playerId: String) : Boolean{
+        LOGGER.info("deletePlayer($playerId)")
+        return playerStore.deleteById(playerId)
     }
 
     companion object {
